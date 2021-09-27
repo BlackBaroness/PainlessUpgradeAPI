@@ -17,20 +17,13 @@ public class PainlessUpgradeAPI extends UpgradeAPI<Object, String, String, Versi
                         @NotNull String currentVersion,
                         @NotNull String oldVersion,
                         @NotNull VersionComparator<String, String> comparator) throws Exception {
-        Set<Method> upgradePoints = filterMethods(Arrays.stream(source.getClass().getDeclaredMethods()))
+        Set<Method> upgradePoints = baseFilterMethods(Arrays.stream(source.getClass().getDeclaredMethods()))
                 .filter(method -> {
                     Policy policy = Policy.LAST;
-
                     UpgradePolicy annotationPolicy = method.getAnnotation(UpgradePolicy.class);
                     if (annotationPolicy != null) {
                         policy = annotationPolicy.value();
                     }
-
-                    // upgrade methods with policy NEVER will not be executed
-                    if (policy == Policy.NEVER) return false;
-
-                    // policy ALWAYS makes methods always executable
-                    if (policy == Policy.ALWAYS) return true;
 
                     // calculation of diff between versions
                     String[] notedVersions = method.getAnnotation(UpgradePoint.class).value();
@@ -42,11 +35,16 @@ public class PainlessUpgradeAPI extends UpgradeAPI<Object, String, String, Versi
                         return false;
                     }
 
-                    // if policy is LAST, diff between versions must be 1
-                    if (policy == Policy.LAST) return diff == 1;
-
-                    // if policy is AFTER, diff must be positive
-                    if (policy == Policy.AFTER) return diff > 0;
+                    switch (policy) {
+                        case LAST:
+                            return onLast(method, diff);
+                        case AFTER:
+                            return onAfter(method, diff);
+                        case ALWAYS:
+                            return onAlways(method);
+                        case NEVER:
+                            return onNever(method);
+                    }
 
                     return false;
                 })

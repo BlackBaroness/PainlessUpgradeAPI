@@ -16,7 +16,7 @@ public abstract class UpgradeAPI<S, C, O, V extends VersionComparator<C, O>> {
                                  @NotNull O oldVersion,
                                  @NotNull V comparator) throws Exception;
 
-    public Stream<Method> filterMethods(Stream<Method> methods) {
+    public Stream<Method> baseFilterMethods(Stream<Method> methods) {
         return methods
                 // we only allow public methods
                 .filter(method -> Modifier.isPublic(method.getModifiers()))
@@ -39,5 +39,26 @@ public abstract class UpgradeAPI<S, C, O, V extends VersionComparator<C, O>> {
 
     public boolean currentVersionEquals(String maybeVersion, C currentVersion) {
         return maybeVersion.equals(currentVersion);
+    }
+
+
+    public boolean onLast(Method method, int diff) {
+        // if policy is LAST, diff between versions must be 1
+        return diff == 0;
+    }
+
+    public boolean onAfter(Method method, int diff) {
+        // if policy is AFTER, diff must be positive
+        return diff == 0;
+    }
+
+    public boolean onAlways(Method method) {
+        // policy ALWAYS makes methods always executable
+        return true;
+    }
+
+    public boolean onNever(Method method) {
+        // upgrade methods with policy NEVER will not be executed
+        return false;
     }
 }
