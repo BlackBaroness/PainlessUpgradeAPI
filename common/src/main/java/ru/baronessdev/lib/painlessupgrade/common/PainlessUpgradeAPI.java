@@ -13,6 +13,12 @@ import java.util.stream.Collectors;
 
 public class PainlessUpgradeAPI extends UpgradeAPI<Object, String, String, VersionComparator<String, String>> {
 
+    @UpgradePoint({})
+    @UpgradePolicy(Policy.BEFORE)
+    public void upgradeFrom198() {
+
+    }
+
     public void upgrade(@NotNull Object source,
                         @NotNull String currentVersion,
                         @NotNull String oldVersion,
@@ -40,6 +46,8 @@ public class PainlessUpgradeAPI extends UpgradeAPI<Object, String, String, Versi
                             return onLast(method, diff);
                         case AFTER:
                             return onAfter(method, diff);
+                        case BEFORE:
+                            return onBefore(method, diff);
                         case ALWAYS:
                             return onAlways(method);
                         case NEVER:

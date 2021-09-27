@@ -49,7 +49,12 @@ public abstract class UpgradeAPI<S, C, O, V extends VersionComparator<C, O>> {
 
     public boolean onAfter(Method method, int diff) {
         // if policy is AFTER, diff must be positive
-        return diff == 0;
+        return diff > 0;
+    }
+
+    public boolean onBefore(Method method, int diff) {
+        // if policy is AFTER, diff must be negative
+        return diff < 0;
     }
 
     public boolean onAlways(Method method) {
