@@ -1,4 +1,4 @@
-package ru.baronessdev.lib.painlessupgrade.common.comparator;
+package ru.baronessdev.lib.painlessupgrade.comparator;
 
 public abstract class VersionComparator<V> {
 

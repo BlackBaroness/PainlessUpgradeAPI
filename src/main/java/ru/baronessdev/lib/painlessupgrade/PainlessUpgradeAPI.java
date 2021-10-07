@@ -1,10 +1,10 @@
-package ru.baronessdev.lib.painlessupgrade.common;
+package ru.baronessdev.lib.painlessupgrade;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.baronessdev.lib.painlessupgrade.common.annotations.IntUpgradePoint;
-import ru.baronessdev.lib.painlessupgrade.common.annotations.UpgradePoint;
-import ru.baronessdev.lib.painlessupgrade.common.comparator.VersionComparator;
+import ru.baronessdev.lib.painlessupgrade.annotations.IntUpgradePoint;
+import ru.baronessdev.lib.painlessupgrade.annotations.UpgradePoint;
+import ru.baronessdev.lib.painlessupgrade.comparator.VersionComparator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

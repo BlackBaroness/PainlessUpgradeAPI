@@ -1,4 +1,4 @@
-package ru.baronessdev.lib.painlessupgrade.common.annotations;
+package ru.baronessdev.lib.painlessupgrade.annotations;
 
 import org.jetbrains.annotations.NotNull;
 

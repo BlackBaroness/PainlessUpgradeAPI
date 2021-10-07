@@ -5,19 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.baronessdev.lib</groupId>
-    <artifactId>painlessupgrade</artifactId>
+    <artifactId>PainlessUpgradeAPI</artifactId>
     <version>1</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-
-    <modules>
-        <module>common</module>
-    </modules>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->

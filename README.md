@@ -7,7 +7,7 @@ It based on simple annotation system and can be changed using provided abstracti
 Imagine situation: you have some program with version v198. One day you're releasing v199, and it breaks something on user-side, 
 e.g. some configuration section was renamed, or you made something with upgrading data to new style.
 
-In this case, write a lot of legacy-support code is awful idea. You usually don't want to think about old versions and support code for migrate.
+In this case, writing a lot of legacy-support code is awful idea. You usually don't want to think about old versions and support code for migrate.
 
 Using **PainlessUpgradeAPI** you can clearly and simple organize all your legacy-support code without checking old version with your hands.
 Just leave this boring job to library by adding some simple annotations.
