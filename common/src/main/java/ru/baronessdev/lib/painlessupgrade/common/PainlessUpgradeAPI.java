@@ -1,66 +1,44 @@
 package ru.baronessdev.lib.painlessupgrade.common;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ru.baronessdev.lib.painlessupgrade.common.annotations.IntUpgradePoint;
 import ru.baronessdev.lib.painlessupgrade.common.annotations.UpgradePoint;
-import ru.baronessdev.lib.painlessupgrade.common.annotations.UpgradePolicy;
 import ru.baronessdev.lib.painlessupgrade.common.comparator.VersionComparator;
-import ru.baronessdev.lib.painlessupgrade.common.exception.UpgradeException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.lang.reflect.Modifier;
+import java.util.stream.Stream;
 
-public class PainlessUpgradeAPI extends UpgradeAPI<Object, String, String, VersionComparator<String, String>> {
+public abstract class PainlessUpgradeAPI<S, O, V extends VersionComparator<O>> {
 
-    @UpgradePoint({})
-    @UpgradePolicy(Policy.BEFORE)
-    public void upgradeFrom198() {
+    @IntUpgradePoint({123, 123})
+    public abstract boolean upgrade(@NotNull S source,
+                                    @NotNull O oldVersion,
+                                    @NotNull V comparator,
+                                    @Nullable Object... methodParams
+    ) throws Exception;
 
-    }
-
-    public void upgrade(@NotNull Object source,
-                        @NotNull String currentVersion,
-                        @NotNull String oldVersion,
-                        @NotNull VersionComparator<String, String> comparator) throws Exception {
-        Set<Method> upgradePoints = baseFilterMethods(Arrays.stream(source.getClass().getDeclaredMethods()))
-                .filter(method -> {
-                    Policy policy = Policy.LAST;
-                    UpgradePolicy annotationPolicy = method.getAnnotation(UpgradePolicy.class);
-                    if (annotationPolicy != null) {
-                        policy = annotationPolicy.value();
-                    }
-
-                    // calculation of diff between versions
-                    String[] notedVersions = method.getAnnotation(UpgradePoint.class).value();
-                    int diff;
-                    try {
-                        diff = getDiff(notedVersions, currentVersion, oldVersion, comparator);
-                    } catch (UpgradeException e) {
-                        // version is not acceptable
-                        return false;
-                    }
-
-                    switch (policy) {
-                        case LAST:
-                            return onLast(method, diff);
-                        case AFTER:
-                            return onAfter(method, diff);
-                        case BEFORE:
-                            return onBefore(method, diff);
-                        case ALWAYS:
-                            return onAlways(method);
-                        case NEVER:
-                            return onNever(method);
-                    }
-
-                    return false;
-                })
-
-                .collect(Collectors.toSet());
-
-        for (Method method : upgradePoints) {
-            method.invoke(source);
+    public @NotNull Stream<Method> filterMethods(@NotNull Stream<Method> methods,
+                                        @Nullable Class<? extends Annotation> upgradeAnnotation,
+                                        @Nullable Object... methodParams
+    ) {
+        if (upgradeAnnotation == null) {
+            // setting default annotation
+            upgradeAnnotation = UpgradePoint.class;
         }
+
+        Class<? extends Annotation> finalUpgradeAnnotation = upgradeAnnotation;
+
+        return methods
+                // we only allow public methods
+                .filter(method -> Modifier.isPublic(method.getModifiers()))
+
+                // upgrade methods must be annotated with upgrade annotation
+                .filter(method -> method.isAnnotationPresent(finalUpgradeAnnotation))
+
+                // upgrade methods must not have any parameters
+                .filter(method -> method.getParameterCount() == methodParams.length);
     }
 }

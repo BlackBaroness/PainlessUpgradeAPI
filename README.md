@@ -24,51 +24,44 @@ This is pretty simple, I'm sure you can handle it.
 
 ## Oh... How does it look?
 
-After releasing v199, I want to clear the database.
+Very simple example:
 
 ```java
-@UpgradePoint("198")
+@UpgradePoint("198-BETA")
 public void upgradeFrom198() {
     database.clear();
 }
-```
 
-Or... I want to clear database after **versions before 159** and **versions after 176**.
-
-```java
-@UpgradePoint("159")
-@UpgradePolicy(Policy.BEFORE)
-public void upgradeBefore159() {
-    database.clear();
-}
-
-@UpgradePoint("176")
-@UpgradePolicy(Policy.AFTER)
-public void upgradeAfter176() {
-    database.clear();
+public void launch() {
+    new StringVersionUpgradeAPI().upgrade(
+        this,
+        "213-SNAPSHOT" // last enabled version
+    );
 }
 ```
 
-Looks simple, yea? How about multiply versions?
-
+Advanced example:
 ```java
-@UpgradePoint("190", "197", "198")
-public void upgradeFromSomeBadVersions() {
-    database.clear();
-}
-```
-
-And we have some additional policy to various solutions:
-```java
-@UpgradePoint({})
-@UpgradePolicy(Policy.ALWAYS)
-public void alwaysUpgrade() {
-    System.out.println("You will always see me")
+@IntUpgradePoint({54, 55})
+public void repairBrokenConfiguration(YamlConfiguration configuration) {
+    configuration.set("broken-block", null);
+    configuration.set("new-block", "some setting");
 }
 
-@UpgradePoint({})
-@UpgradePolicy(Policy.NEVER)
-public void neverUpgrade() {
-    System.out.println("We'll never meet")
+@IntUpgradePoint(96)
+public void createNewSections(YamlConfiguration configuration) {
+    configuration.setDefaults(getDefaults());
+}
+
+public void launch(YamlConfiguration configuration) {
+    boolean configChanged = new IntVersionUpgradeAPI().upgrade(
+        this,
+        getLastVersion(),
+        configuration
+    );
+    
+    if (configChanged) {
+        configuration.save();
+    }
 }
 ```
